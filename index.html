@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="Access-Control-Allow-Origin" content="*" />
+<title>付款</title>
+<style>
+ body {
+   padding: 0;margin: 0
+ }
+ .policybox {
+   position: relative;
+   width: 100%;
+   height: 100vh;
+   background: url(images/policyfile.png);
+   background-size: 100% auto
+ }
+ .openbtn {
+   position:absolute;
+   bottom: 2.8rem;
+   left: 50%;
+   width: 50%;
+   height: .8rem;
+   margin-left: -25%;
+   font-size: .28rem;
+   text-align: center;
+   line-height: .8rem;
+   background: #3bc33b;
+   color: #fff
+ }
+</style>
+</head>
+
+<body>
+<div class="policybox">
+  <div class="openbtn">点击开通</div>
+  <form style="display:none;" id="formpay" name="formpay" method="post" action="https://pay.paysapi.com">
+    <input name="goodsname" id="goodsname" type="text" value="" />
+    <input name="istype" id="istype" type="text" value="" />
+    <input name="key" id="key" type="text" value=""/>
+    <input name="notify_url" id="notify_url" type="text" value=""/>
+    <input name="orderid" id="orderid" type="text" value=""/>
+    <input name="orderuid" id="orderuid" type="text" value=""/>
+    <input name="price" id="price" type="text" value=""/>
+    <input name="return_url" id="return_url" type="text" value=""/>
+    <input name="uid" id="uid" type="text" value=""/>
+    <input type="submit" id="submitdemo1">
+  </form>
+</div>
+<script src="js/jquery-3.1.1.min.js"></script>
+<script src="js/jsencrypt.min.js"></script>
+<script>
+// 手机端适配
+document.documentElement.style.fontSize = document.documentElement.clientWidth / 750 * 100 + "px";
+</script>
+<script>
+//jQuery.support.cors = true
+$(function() {
+  let data = {
+    token: getRsaCode('fd846da1-42a1-4127-a205-c151e9025f87'),
+	price: 0.01,
+	istype: 1
+  }
+  $('.openbtn').click(function() {
+    $.ajax({
+	  url: 'http://3d0l389645.wicp.vip/pays/pay',
+	  type: 'post',
+	  data: data,
+	  dataType: 'json',
+	  success: function (data) {
+	    console.info(data);
+		if (data.datalist && data.datalist.data.goodsname) {
+		  $("#goodsname").val(data.datalist.data.goodsname);
+		  console.log($("#goodsname").val())
+		  $("#istype").val(data.datalist.data.istype);
+		  $('#key').val(data.datalist.data.key);
+		  $('#notify_url').val(data.datalist.data.notify_url);
+		  $('#orderid').val(data.datalist.data.orderid);
+		  $('#orderuid').val(data.datalist.data.orderuid);
+		  $('#price').val(data.datalist.data.price);
+		  $('#return_url').val(data.datalist.data.return_url);
+		  $('#uid').val(data.datalist.data.uid);
+		  $('#submitdemo1').click();
+		}
+	  },
+	  error: function (xhr) {
+	    console.error('Something went wrong....');
+	  }
+	});
+  });
+});
+function getRsaCode(str) {
+  let pubKey = `MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCu5Z6ikQOr8RYHKNIQnkw/3XaaSLxcQ8wAOOGWYw2FnJ1V1ZpiwP+TjXSre+5SN7Ism2miN413j9d4UOrUz++CDtWVdbWkxezeMh7NsZtK8DAxhtMjI67FcTh/b9bXWgHbVzPDWnVDW3Yl5TJhoKSOPx/EfeKoI9vh+hOLngmMjwIDAQAB`// ES6 模板字符串 引用 rsa 公钥
+  let encryptStr = new JSEncrypt()
+  encryptStr.setPublicKey(pubKey) // 设置 加密公钥
+  let data = encryptStr.encrypt(str.toString()) // 进行加密
+  return data
+ }
+</script>
+</body>
+</html>
